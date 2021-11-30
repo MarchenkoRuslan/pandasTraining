@@ -42,6 +42,7 @@ def fix(sample, dumple):
 
 
 sample = sample.astype(data_types)
+sample['TransactionDate'] = pd.to_datetime(sample["TransactionDate"].dt.strftime('%Y-%m-%d'))
 
 for file in os.listdir(files):
     if file.endswith(".csv"):
@@ -52,6 +53,8 @@ for file in os.listdir(files):
                                     columns=['File name', 'Row count', 'Col count'] + [col for col in list(dumple)])
 
         dumple = fix(sample, dumple)
+        dumple['TransactionDate'] = pd.to_datetime(dumple["TransactionDate"].dt.strftime('%Y-%m-%d'))
+        print(dumple['TransactionDate'])
 
         merged = sample.merge(dumple, indicator=True, how='outer')
         sheets['Match ' + file] = merged
