@@ -4,14 +4,14 @@ from pandas.api.types import CategoricalDtype
 
 files = 'files/'
 match = pd.DataFrame()
+sheets = {}
 
 sample = pd.read_csv('sample_file.csv')
-report = pd.DataFrame([['sample_file.csv', len(sample.index),
-                        sample['AccountNumber'].dtype, sample['SecurityCode'].dtype,
-                        sample['Price'].dtype, sample['TransactionDate'].dtype]],
-                      columns=['File name', 'Row count', 'AccountNumber', 'SecurityCode', 'Price', 'TransactionDate'])
+report = pd.DataFrame([['sample_file.csv', len(sample.index), sample.shape[1]]
+                       + [sample[col].dtype for col in list(sample)]],
+                      columns=['File name', 'Row count', 'Col count'] + [col for col in list(sample)])
 
-sheets = {'sample_file.csv': report}
+sheets['BASE'] = report
 
 status_type = CategoricalDtype(categories=['EF', 'MF', 'OT'], ordered=False)
 col_order = ['AccountNumber', 'SecurityCode', 'Price', 'TransactionDate']
@@ -47,24 +47,15 @@ for file in os.listdir(files):
     if file.endswith(".csv"):
         path = files + file
         dumple = pd.read_csv(path)
-        sheets[file] = pd.DataFrame([file, len(dumple.index), [dumple[col].dtype for col in list(dumple)]],
-                                    columns=['File name', 'Row count', [col for col in list(dumple)]])
+        sheets[file] = pd.DataFrame([[file, len(dumple.index), dumple.shape[1]]
+                                     + [dumple[col].dtype for col in list(dumple)]],
+                                    columns=['File name', 'Row count', 'Col count'] + [col for col in list(dumple)])
 
-        print(file)
         dumple = fix(sample, dumple)
 
-        # addon = pd.DataFrame([[file, len(dumple.index),
-        #                        dumple['AccountNumber'].dtype, dumple['SecurityCode'].dtype,
-        #                        dumple['Price'].dtype, dumple['TransactionDate'].dtype]],
-        #                      columns=['File name', 'Row count', 'AccountNumber', 'SecurityCode', 'Price',
-        #                               'TransactionDate'])
-        # frames = [report, addon]
-        # report = pd.concat(frames)
-
         merged = sample.merge(dumple, indicator=True, how='outer')
-        match = pd.concat([match, merged], ignore_index=True)
+        sheets['Match ' + file] = merged
 
-sheets['Match'] = match
 writer = pd.ExcelWriter('./report.xlsx', engine='xlsxwriter')
 
 for sheet_name in sheets.keys():
