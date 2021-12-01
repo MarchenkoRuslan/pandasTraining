@@ -34,9 +34,9 @@ def fix(sample, dumple):
         if tuple(dumple.columns) != tuple(col_order) and dumple.columns.all() in col_order:
             dumple = dumple[col_order]
         else:
-            dumple = pd.read_csv(path, names=col_order, header=0)
+            dumple = pd.read_csv(path, names=col_order, header=0, converters={'AccountNumber': str})
+            dumple = dumple.loc[dumple['AccountNumber'] != "AccountNumber"]
 
-    dumple = dumple.loc[dumple['AccountNumber'] != "AccountNumber"]
     dumple = dumple.astype(data_types)
     return dumple
 
@@ -47,12 +47,13 @@ for file in os.listdir(files):
     if file.endswith(".csv"):
         path = files + file
         dumple = pd.read_csv(path, converters={'AccountNumber': str})
+
         sheets[file] = pd.DataFrame([[file, len(dumple.index), dumple.shape[1]]
                                      + [dumple[col].dtype for col in list(dumple)]],
                                     columns=['File name', 'Row count', 'Col count'] + [col for col in list(dumple)])
 
         dumple = fix(sample, dumple)
-
+        print(dumple)
         merged = sample.merge(dumple, indicator=True, how='outer')
         sheets['Match ' + file] = merged
 
