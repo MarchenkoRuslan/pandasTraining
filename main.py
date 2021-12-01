@@ -6,7 +6,7 @@ files = 'files/'
 match = pd.DataFrame()
 sheets = {}
 
-sample = pd.read_csv('sample_file.csv')
+sample = pd.read_csv('sample_file.csv', converters={'AccountNumber': str})
 report = pd.DataFrame([['sample_file.csv', len(sample.index), sample.shape[1]]
                        + [sample[col].dtype for col in list(sample)]],
                       columns=['File name', 'Row count', 'Col count'] + [col for col in list(sample)])
@@ -46,7 +46,7 @@ sample = sample.astype(data_types)
 for file in os.listdir(files):
     if file.endswith(".csv"):
         path = files + file
-        dumple = pd.read_csv(path)
+        dumple = pd.read_csv(path, converters={'AccountNumber': str})
         sheets[file] = pd.DataFrame([[file, len(dumple.index), dumple.shape[1]]
                                      + [dumple[col].dtype for col in list(dumple)]],
                                     columns=['File name', 'Row count', 'Col count'] + [col for col in list(dumple)])
