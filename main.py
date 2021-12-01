@@ -10,6 +10,10 @@ sample = pd.read_csv('sample_file.csv', converters={'AccountNumber': str})
 report = pd.DataFrame([['sample_file.csv', len(sample.index), sample.shape[1]]
                        + [sample[col].dtype for col in list(sample)]],
                       columns=['File name', 'Row count', 'Col count'] + [col for col in list(sample)])
+report['AccountNumber'] = str(report['AccountNumber'].values[0]) + '\n 8 digit'
+report['SecurityCode'] = str(report['SecurityCode'].values[0]) + '\n choice of 3 values'
+report['Price'] = str(report['Price'].values[0]) + '\n 2 digit after 0'
+report['TransactionDate'] = str(report['TransactionDate'].values[0]) + '\n yyyy-mm-dd'
 
 sheets['BASE'] = report
 
@@ -53,7 +57,6 @@ for file in os.listdir(files):
                                     columns=['File name', 'Row count', 'Col count'] + [col for col in list(dumple)])
 
         dumple = fix(sample, dumple)
-        print(dumple)
         merged = sample.merge(dumple, indicator=True, how='outer')
         sheets['Match ' + file] = merged
 
