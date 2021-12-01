@@ -18,7 +18,7 @@ col_order = ['AccountNumber', 'SecurityCode', 'Price', 'TransactionDate']
 data_types = {'AccountNumber': 'object',
               'SecurityCode': status_type,
               'Price': 'float64',
-              'TransactionDate': 'datetime64'}
+              'TransactionDate': 'object'}
 
 
 def fix(sample, dumple):
@@ -42,7 +42,6 @@ def fix(sample, dumple):
 
 
 sample = sample.astype(data_types)
-sample['TransactionDate'] = pd.to_datetime(sample["TransactionDate"].dt.strftime('%Y-%m-%d'))
 
 for file in os.listdir(files):
     if file.endswith(".csv"):
@@ -53,8 +52,6 @@ for file in os.listdir(files):
                                     columns=['File name', 'Row count', 'Col count'] + [col for col in list(dumple)])
 
         dumple = fix(sample, dumple)
-        dumple['TransactionDate'] = pd.to_datetime(dumple["TransactionDate"].dt.strftime('%Y-%m-%d'))
-        print(dumple['TransactionDate'])
 
         merged = sample.merge(dumple, indicator=True, how='outer')
         sheets['Match ' + file] = merged
@@ -84,5 +81,6 @@ if __name__ == "__main__":
             print(path)
             print('===============================================')
             dumple = pd.read_csv(path)
+            print(dumple)
             print(checking(sample, dumple))
             print('===============================================')
