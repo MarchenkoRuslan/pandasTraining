@@ -3,22 +3,20 @@ import pandas as pd
 import os
 import main
 
+files = main.files
+pull = []
 
-# @pytest.fixture(scope="module")
-# def fixture():
-#
-#     return [sample, files, col_order, data_types, dumple]
+for file in os.listdir(files):
+    if file.endswith(".csv"):
+        pull += [file]
 
 
-def test_sample():
+@pytest.mark.parametrize('dumple', pull)
+def test_sample(dumple):
     sample = main.sample
-    files = main.files
+    path = files + file
 
-    for file in os.listdir(files):
-        if file.endswith(".csv"):
-            path = files + file
-            dumple = pd.read_csv(path)
-            dumple = main.fix(sample, dumple)
+    dumple = pd.read_csv(path)
+    dumple = main.fix(sample, dumple)
 
-            for col in dumple:
-                assert dumple[col].dtype == sample[col].dtype
+    assert all(dumple.dtypes == sample.dtypes)
