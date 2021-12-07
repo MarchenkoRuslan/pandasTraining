@@ -12,7 +12,7 @@ report = pd.DataFrame([['sample_file.csv', len(sample.index), sample.shape[1]]
                       columns=['File name', 'Row count', 'Col count'] + [col for col in list(sample)])
 report['AccountNumber'] = str(report['AccountNumber'].values[0]) + '\n 8 digit'
 report['SecurityCode'] = str(report['SecurityCode'].values[0]) + '\n choice of 3 values'
-report['Price'] = str(report['Price'].values[0]) + '\n 2 digit after 0'
+report['Price'] = str(report['Price'].values[0]) + '\n 0 digit after 0'
 report['TransactionDate'] = str(report['TransactionDate'].values[0]) + '\n yyyy-mm-dd'
 
 sheets['BASE'] = report
@@ -45,20 +45,25 @@ def fix(sample, dumple):
     return dumple
 
 
+def sheet_generator(path):
+    dumple = pd.read_csv(path, converters={'AccountNumber': str})
+
+    sheets[file] = pd.DataFrame([[file, len(dumple.index), dumple.shape[1]]
+                                 + [dumple[col].dtype for col in list(dumple)]],
+                                columns=['File name', 'Row count', 'Col count'] + [col for col in list(dumple)])
+
+    dumple = fix(sample, dumple)
+    merged = sample.merge(dumple, indicator=True, how='outer')
+    sheets['Match ' + file] = merged
+    return sheets
+
+
 sample = sample.astype(data_types)
 
 for file in os.listdir(files):
     if file.endswith(".csv"):
         path = files + file
-        dumple = pd.read_csv(path, converters={'AccountNumber': str})
-
-        sheets[file] = pd.DataFrame([[file, len(dumple.index), dumple.shape[1]]
-                                     + [dumple[col].dtype for col in list(dumple)]],
-                                    columns=['File name', 'Row count', 'Col count'] + [col for col in list(dumple)])
-
-        dumple = fix(sample, dumple)
-        merged = sample.merge(dumple, indicator=True, how='outer')
-        sheets['Match ' + file] = merged
+        sheet_generator(path)
 
 writer = pd.ExcelWriter('./report.xlsx', engine='xlsxwriter')
 
