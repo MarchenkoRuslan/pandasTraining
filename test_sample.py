@@ -1,4 +1,5 @@
 import pytest
+import pandas as pd
 import os
 import main
 
@@ -12,7 +13,11 @@ for file in os.listdir(files):
 
 @pytest.mark.parametrize('dumple', pull)
 def test_sample(dumple):
-    path = files + file
+    path = files + dumple
     sheets = main.sheet_generator(path)
-    main_sheet = main.sheets
-    assert sheets == main_sheet
+
+    etalon_sheet = pd.read_excel('./etalon.xlsx', sheet_name=dumple)
+    assert all(sheets[dumple] == etalon_sheet)
+
+    etalon_sheet = pd.read_excel('./etalon.xlsx', sheet_name='Match ' + dumple)
+    assert all(sheets['Match ' + dumple] == etalon_sheet)
