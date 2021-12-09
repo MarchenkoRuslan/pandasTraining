@@ -48,9 +48,15 @@ def fix(sample, dumple):
 def sheet_generator(path):
     dumple = pd.read_csv(path, converters={'AccountNumber': str})
 
-    sheets[file] = pd.DataFrame([[file, len(dumple.index), dumple.shape[1]]
-                                 + [dumple[col].dtype for col in list(dumple)]],
-                                columns=['File name', 'Row count', 'Col count'] + [col for col in list(dumple)])
+    if path == 'files/no_headers.csv':
+        sheets[file] = pd.DataFrame([[file, len(dumple.index), dumple.shape[1]]
+                                     + [dumple[col].dtype for col in list(dumple)]],
+                                    columns=['File name', 'Row count', 'Col count'] + ['Col 1', 'Col 2',
+                                                                                       'Col 3', 'Col 4'])
+    else:
+        sheets[file] = pd.DataFrame([[file, len(dumple.index), dumple.shape[1]]
+                                     + [dumple[col].dtype for col in list(dumple)]],
+                                    columns=['File name', 'Row count', 'Col count'] + [col for col in list(dumple)])
 
     dumple = fix(sample, dumple)
     merged = sample.merge(dumple, indicator=True, how='outer')
