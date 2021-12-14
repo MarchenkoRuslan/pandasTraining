@@ -71,13 +71,6 @@ for file in os.listdir(files):
         path = files + file
         sheet_generator(path)
 
-writer = pd.ExcelWriter('./report.xlsx', engine='xlsxwriter')
-
-for sheet_name in sheets.keys():
-    sheets[sheet_name].to_excel(writer, sheet_name=sheet_name, index=None)
-
-writer.save()
-
 if __name__ == "__main__":
 
     def checking(sample, dumple):
@@ -94,8 +87,15 @@ if __name__ == "__main__":
         if file.endswith(".csv"):
             path = files + file
             print(path)
-            print('===============================================')
+            print('===============================================')git
             dumple = pd.read_csv(path)
             print(dumple)
             print(checking(sample, dumple))
             print('===============================================')
+
+    writer = pd.ExcelWriter('./report.xlsx', engine='xlsxwriter')
+
+    for sheet_name in sheets.keys():
+        sheets[sheet_name].to_excel(writer, sheet_name=sheet_name, index=None)
+
+    writer.save()

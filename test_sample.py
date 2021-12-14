@@ -5,7 +5,7 @@ import main
 from pandas.testing import assert_frame_equal
 from pandas.api.types import CategoricalDtype
 
-files = main.files
+files = 'files/'
 pull = []
 data_types = {'AccountNumber': 'object',
               'SecurityCode': CategoricalDtype(categories=['EF', 'MF', 'OT'], ordered=False),
