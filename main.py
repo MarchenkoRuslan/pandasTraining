@@ -1,10 +1,14 @@
 import pandas as pd
 import os
 from pandas.api.types import CategoricalDtype
+import numpy
+import math
+
 
 files = 'files/'
 match = pd.DataFrame()
 sheets = {}
+sizes = []
 
 sample = pd.read_csv('sample_file.csv', converters={'AccountNumber': str})
 report = pd.DataFrame([['sample_file.csv', len(sample.index), sample.shape[1]]
@@ -23,6 +27,9 @@ data_types = {'AccountNumber': 'object',
               'SecurityCode': status_type,
               'Price': 'float64',
               'TransactionDate': 'object'}
+
+full = sample
+info = pd.DataFrame(index=[col for col in sample])
 
 
 def fix(sample, dumple):
@@ -70,6 +77,13 @@ for file in os.listdir(files):
     if file.endswith(".csv"):
         path = files + file
         sheet_generator(path)
+        full = full.append(fix(sample, pd.read_csv(path, converters={'AccountNumber': str})),
+                           ignore_index=True, sort=False)
+
+for col in full:
+    sizes.append(math.floor(numpy.mean(full[col].astype(str).str.len())))
+
+info['size'] = sizes
 
 if __name__ == "__main__":
 
@@ -87,7 +101,7 @@ if __name__ == "__main__":
         if file.endswith(".csv"):
             path = files + file
             print(path)
-            print('===============================================')git
+            print('===============================================')
             dumple = pd.read_csv(path)
             print(dumple)
             print(checking(sample, dumple))
@@ -99,3 +113,6 @@ if __name__ == "__main__":
         sheets[sheet_name].to_excel(writer, sheet_name=sheet_name, index=None)
 
     writer.save()
+
+    print(full)
+    print(info)
