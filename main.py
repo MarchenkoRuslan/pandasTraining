@@ -3,12 +3,14 @@ import os
 from pandas.api.types import CategoricalDtype
 import numpy
 import math
-
+import decimal
 
 files = 'files/'
 match = pd.DataFrame()
 sheets = {}
 sizes = []
+values = []
+after_dot = []
 
 sample = pd.read_csv('sample_file.csv', converters={'AccountNumber': str})
 report = pd.DataFrame([['sample_file.csv', len(sample.index), sample.shape[1]]
@@ -16,7 +18,7 @@ report = pd.DataFrame([['sample_file.csv', len(sample.index), sample.shape[1]]
                       columns=['File name', 'Row count', 'Col count'] + [col for col in list(sample)])
 report['AccountNumber'] = str(report['AccountNumber'].values[0]) + '\n 8 digit'
 report['SecurityCode'] = str(report['SecurityCode'].values[0]) + '\n choice of 3 values'
-report['Price'] = str(report['Price'].values[0]) + '\n 0 digit after 0'
+report['Price'] = str(report['Price'].values[0]) + '\n 0 digit after dot'
 report['TransactionDate'] = str(report['TransactionDate'].values[0]) + '\n yyyy-mm-dd'
 
 sheets['BASE'] = report
@@ -82,8 +84,14 @@ for file in os.listdir(files):
 
 for col in full:
     sizes.append(math.floor(numpy.mean(full[col].astype(str).str.len())))
+    values.append(len(set(full[col])))
+    # for val in col:
+    #     x = abs(decimal.Decimal(val.rstrip('0')).as_tuple().exponent)
+    #     print(x)
 
 info['size'] = sizes
+info['values'] = values
+# info['after dot'] = after_dot
 
 if __name__ == "__main__":
 
