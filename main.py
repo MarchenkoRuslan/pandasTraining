@@ -4,6 +4,8 @@ from pandas.api.types import CategoricalDtype
 import numpy
 import math
 import decimal
+import re
+from datetime import datetime
 
 files = 'files/'
 match = pd.DataFrame()
@@ -11,6 +13,7 @@ sheets = {}
 sizes = []
 values = []
 after_dot = []
+date_format = []
 
 sample = pd.read_csv('sample_file.csv', converters={'AccountNumber': str})
 report = pd.DataFrame([['sample_file.csv', len(sample.index), sample.shape[1]]
@@ -85,13 +88,25 @@ for file in os.listdir(files):
 for col in full:
     sizes.append(math.floor(numpy.mean(full[col].astype(str).str.len())))
     values.append(len(set(full[col])))
-    # for val in col:
-    #     x = abs(decimal.Decimal(val.rstrip('0')).as_tuple().exponent)
-    #     print(x)
+
+    if col == 'Price':
+        for val in range(len(col) - 1):
+            x = str(full.at[val, col])
+            x = abs(decimal.Decimal(x.rstrip('0')).as_tuple().exponent)
+            after_dot.append(x)
+
+    if col == 'TransactionDate':
+        for val in range(4):
+            x = full.at[val, col]
+            match = re.search(r'\d{4}-\d{2}-\d{2}', x)
+            date = datetime.strptime(match.group(), '%Y-%m-%d').date()
+            date_format.append('yyyy-mm-dd')
 
 info['size'] = sizes
 info['values'] = values
-# info['after dot'] = after_dot
+info['after dot'] = after_dot
+info['date format'] = date_format
+
 
 if __name__ == "__main__":
 
