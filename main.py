@@ -100,7 +100,8 @@ for col in full:
             x = full.at[val, col]
             match = re.search(r'\d{4}-\d{2}-\d{2}', x)
             date = datetime.strptime(match.group(), '%Y-%m-%d').date()
-            date_format.append('yyyy-mm-dd')
+            if date:
+                date_format.append('yyyy-mm-dd')
 
 info['size'] = sizes
 info['values'] = values
