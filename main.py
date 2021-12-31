@@ -1,11 +1,12 @@
-import pandas as pd
-import os
-from pandas.api.types import CategoricalDtype
-import numpy
-import math
 import decimal
+import math
+import os
 import re
 from datetime import datetime
+
+import numpy
+import pandas as pd
+from pandas.api.types import CategoricalDtype
 
 files = 'files/'
 match = pd.DataFrame()
@@ -90,7 +91,7 @@ for col in full:
     values.append(len(set(full[col])))
 
     if col == 'Price':
-        for val in range(len(col) - 1):
+        for val in range(4):
             x = str(full.at[val, col])
             x = abs(decimal.Decimal(x.rstrip('0')).as_tuple().exponent)
             after_dot.append(x)
@@ -107,7 +108,6 @@ info['size'] = sizes
 info['values'] = values
 info['after dot'] = after_dot
 info['date format'] = date_format
-
 
 if __name__ == "__main__":
 
